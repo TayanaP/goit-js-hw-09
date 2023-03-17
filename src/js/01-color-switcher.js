@@ -11,11 +11,6 @@ buttonStopEl.addEventListener('click', onStop);
 
 let timerId = null;
 
-// function onStart(event) {
-//   //   console.log('click');
-//   timerId = setInterval(getRandomHexColor, 1000);
-// }
-
 function onStart(event) {
   buttonStartEl.disabled = true;
   buttonStopEl.disabled = false;
