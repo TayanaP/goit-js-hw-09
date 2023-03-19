@@ -8,6 +8,9 @@ const dataMinutes = document.querySelector('[data-minutes]');
 const dataSeconds = document.querySelector('[data-seconds]');
 const dataCalendar = document.querySelector('#datetime-picker');
 
+let timerId = null;
+let formatDate = null;
+
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -15,47 +18,53 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     console.log(selectedDates[0]);
+    differenceDate(selectedDates[0]);
   },
 };
 
+dataStart.setAttribute('disabled', true);
+
 flatpickr(dataCalendar, options);
 
-dataStart.addEventListener('click', () => {
-  const selectedDate = dataCalendar.value;
-  const currentDate = new Date();
-  const countdownDate = new Date(selectedDate);
-  if (countdownDate < currentDate) {
-    // dataStart.disabled = true;
-    // dataStart.setAttribute('disabled', true);
-    window.alert('Please choose a date in the future');
-    return;
+dataStart.addEventListener('click', onBtnStart);
+
+function onBtnStart() {
+  timerId = setInterval(startTimer, 1000);
+}
+
+function differenceDate(selectedDates) {
+  const currentDate = Date.now();
+
+  if (selectedDates < currentDate) {
+    dataStart.setAttribute('disabled', true);
+    return window.alert('Please choose a date in the future');
   }
+  deltaTime = selectedDates.getTime() - currentDate;
+  formatDate = convertMs(deltaTime);
 
-  const deltaTime = countdownDate - currentDate;
-  //
-  const time = convertMs(deltaTime);
+  renderDate(formatDate);
+  dataStart.removeAttribute('disabled');
+}
 
-  dataDays.textContent = addLeadingZero(time.days);
-  dataHours.textContent = addLeadingZero(time.hours);
-  dataMinutes.textContent = addLeadingZero(time.minutes);
-  dataSeconds.textContent = addLeadingZero(time.seconds);
+function renderDate(formatDate) {
+  dataDays.textContent = addLeadingZero(formatDate.days);
+  dataHours.textContent = addLeadingZero(formatDate.hours);
+  dataMinutes.textContent = addLeadingZero(formatDate.minutes);
+  dataSeconds.textContent = addLeadingZero(formatDate.seconds);
+}
 
-  const interval = setInterval(() => {
-    const deltaTime = countdownDate - new Date();
+function startTimer() {
+  dataStart.setAttribute('disabled', true);
 
-    const time = convertMs(deltaTime);
+  deltaTime -= 1000;
 
-    dataDays.textContent = addLeadingZero(time.days);
-    dataHours.textContent = addLeadingZero(time.hours);
-    dataMinutes.textContent = addLeadingZero(time.minutes);
-    dataSeconds.textContent = addLeadingZero(time.seconds);
-
-    if (deltaTime <= 0) {
-      //   dataStart.disabled = false;
-      clearInterval(interval);
-    }
-  }, 1000);
-});
+  if (deltaTime <= 0) {
+    clearInterval(timerId);
+  } else {
+    formatDate = convertMs(deltaTime);
+    renderDate(formatDate);
+  }
+}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
