@@ -10,6 +10,7 @@ const dataCalendar = document.querySelector('#datetime-picker');
 
 let timerId = null;
 let formatDate = null;
+let deltaTime = 0;
 
 const options = {
   enableTime: true,
